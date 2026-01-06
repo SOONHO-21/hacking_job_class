@@ -1,3 +1,0 @@
-1c2649394 : s3021502!
-sample : 12345
-user : passwd
