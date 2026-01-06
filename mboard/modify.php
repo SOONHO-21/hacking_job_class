@@ -26,11 +26,12 @@
     $content = $_POST["content"];
 
     $subject = htmlspecialchars($subject, ENT_QUOTES);
+    
     if($is_html !== 'y'){
         $content = htmlspecialchars($content, ENT_QUOTES);
     }
-    
     $is_html = $_POST['is_html'] ?? 'n';
+
     $regist_day = date("Y-m-d (H:i)");
 
     if(["upfile"]) {

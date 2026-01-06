@@ -15,14 +15,15 @@
     $content = $_POST["content"];
     $is_html = $_POST['is_html'] ?? 'n';		// HTML 쓰기
 
-    // $subject = htmlspecialchars($subject, ENT_QUOTES);  // XSS 방어. HTML 특수문자 변환
+    $subject = htmlspecialchars($subject, ENT_QUOTES);  // XSS 방어. HTML 특수문자 변환
+
     if($is_html !== 'y'){
         $content = htmlspecialchars($content, ENT_QUOTES);
     }
+
     $regist_day = date("Y-m-d (H:i)");
-
+    
     $upload_dir = './data/';    // 첨부파일 저장 디렉토리
-
     $upfile_name = $_FILES["upfile"]["name"];
     $upfile_tmp_name = $_FILES["upfile"]["tmp_name"];
     $upfile_type = $_FILES["upfile"]["type"];
