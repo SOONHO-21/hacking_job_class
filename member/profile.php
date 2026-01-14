@@ -1,15 +1,17 @@
 <?php
-    if (!isset($_GET['user']) || empty($_GET['user'])) {
+    if (!isset($_GET['u']) || empty($_GET['u'])) {
         echo "<script>alert('잘못된 접근입니다.'); history.back();</script>";
         exit;
     }
 
-    $user = $_GET['user'];
+    $public_id = $_GET['u'];
     
     include "../include/db_connect.php";
 
-    $sql = "SELECT * FROM _mem WHERE name='$user'";
-    $result = mysqli_query($con, $sql);
+    $stmt = $con->prepare("SELECT * FROM _mem WHERE public_id = ?");
+    $stmt->bind_param("s", $public_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $row = mysqli_fetch_assoc($result);
 
@@ -38,10 +40,6 @@
     <?php } ?>
 
     <ul class="list-group">
-        <li class="list-group-item">
-            <span class="col1">아이디</span>
-            <span class="col2"><?=$id?></span>
-        </li>
         <li class="list-group-item">
             <span class="col1">이름</span>
             <span class="col2"><?=$name?></span>

@@ -26,7 +26,7 @@
 ?>
     <li><button class="btn btn-secondary" onclick="location.href='../member/modify_form.php'">회원정보 수정</button></li>
     <li><button class="btn btn-secondary" onclick="location.href='../member/logout.php'">로그아웃</button></li>
-    <li><button class="btn btn-secondary" onclick="location.href='../member/profile.php'">프로필</button></li>
+    <li><button class="btn btn-secondary" onclick="location.href='../member/profile.php?u=<?=$public_id?>'">프로필</button></li>
 <?php
     } else {
 ?>
@@ -98,6 +98,7 @@
         $num = $row["num"];
         $id = $row["id"];
         $name = $row["name"];
+        $public_id = $row["public_id"];
         $subject = $row["subject"];
         $regist_day = $row["regist_day"];
         if($row["file_name"])   // 첨부 파일이 있으면
@@ -109,7 +110,7 @@
             <span class="badge bg-secondary"><?=$number?></span>
             <span><a href="view.php?num=<?=$num?>&page=<?=$page?>"><?=$subject?></a></span>
             <span class="badge bg-secondary">
-                <a href="../member/profile.php?user=<?=$name?>">
+                <a href="../member/profile.php?u=<?=$public_id?>">
                     <?=$name?>
                 </a>
             </span>

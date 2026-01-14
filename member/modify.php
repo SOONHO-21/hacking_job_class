@@ -32,7 +32,7 @@
     $name = $_POST["name"];
     $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $email = $_POST["email"];
-    $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+    // $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
 
     $csrf_token = $_POST["csrf_token"];
 
