@@ -24,7 +24,6 @@
     $stmt = $con->prepare("INSERT INTO _mem (id, pass, name, public_id, email, regist_day, level) values(?, ?, ?, ?, ?, ?, 1)");
     $stmt->bind_param('ssssss', $id, $hash_pw, $name, $public_id, $email, $regist_day);
     $stmt->execute();
-    // $result = mysqli_query($con, $sql);     // 쿼리결과
     
     mysqli_close($con);
 

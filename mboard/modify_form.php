@@ -5,9 +5,11 @@
     $num = $_GET["num"];
     $page = $_GET["page"];
 
-    $sql = "SELECT * FROM board WHERE num=$num";
+    $stmt = $con->prepare("SELECT * FROM board WHERE num = ?");
+    $stmt->bind_param('i', $num);
+    $stmt->execute();
 
-    $result = mysqli_query($con, $sql);
+    $result = $stmt->get_result();
     $row = mysqli_fetch_assoc($result);
 
     $subject = $row["subject"];
