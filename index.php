@@ -1,10 +1,5 @@
 <?php
     include "./include/session.php";
-
-    if($userid)
-        echo "<a href='./member/logout.php'>로그아웃<a>";
-    else
-        echo "<a href='./member/login_form.php'>로그인<a>";
 ?>
 <!DOCTYPE html>
 <html>

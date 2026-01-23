@@ -7,7 +7,7 @@
     $name = $_POST["name"];
     $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $email = $_POST["email"];
-    // $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+    $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
     
     $regist_day = date("Y-m-d (H:i)");
 
