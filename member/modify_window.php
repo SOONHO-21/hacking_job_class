@@ -37,9 +37,9 @@
     
     $hash_pw = password_hash($pass, PASSWORD_DEFAULT);
 
-    $upload_dir = '/var/www/uploads/profile/';    // 프로필 사진파일 저장 디렉토리
-    $allowed_Extensions = ['jpg', 'png', 'jepg']; // 화이트리스트로 허용할 확장자
-    $allowed_mime_types = array('image/jpg', 'image/jpeg', 'image/png');
+    $upload_dir = './profile_upload/';      // 첨부파일 저장 디렉토리
+    $allowed_Extensions = ['jpg', 'png'];   // 화이트리스트로 허용할 확장자
+    $allowed_mime_types = array('image/jpeg', 'image/png', 'image/gif', 'text/plain');
     $file = $_FILES['profile_img'];
 
     $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));   // 소문자로 파일명 변환 후 확장자 추출
@@ -85,7 +85,7 @@
                 exit;
             }
         }
-        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = ? WHERE id = ?");
+        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = ? WHERE id=?");
         $stmt->bind_param('sssss', $hash_pw, $name, $email, $new_name, $userid);
         $stmt->execute();
     }

@@ -5,8 +5,6 @@
     include "../include/db_connect.php";
 
     if(isset($id) && isset($pass)) {
-        $hash_pw = hash('sha256', $pass);
-
         $stmt = $con->prepare("SELECT * from _mem WHERE id=?");
         $stmt->bind_param('s', $id);
         $stmt->execute();

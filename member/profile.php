@@ -19,6 +19,7 @@
     $pass = $row["pass"];
     $name = $row["name"];
     $email = $row["email"];
+    $profile_img = $row['profile_img'];
     $regist_day = date("Y-m-d (H:i)");
 ?>
 <script>
@@ -32,11 +33,7 @@
 </head>
 <body> 
     <h2>프로필</h2>
-    <?php if($profile_img) { ?>
-        <img src="./profile_upload/<?=$profile_img?>" width="220" height="150"><br>
-    <?php } else { ?>
-        <img src="../img/default_profile.png" width="220" height="150"><br>
-    <?php } ?>
+    <img src="profile_image.php?public_id=<?=$public_id?>" width="220" height="150">
 
     <ul class="list-group">
         <li class="list-group-item">

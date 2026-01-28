@@ -37,55 +37,59 @@
     
     $hash_pw = password_hash($pass, PASSWORD_DEFAULT);
 
-    $upload_dir = './profile_upload/';      // 첨부파일 저장 디렉토리
-    $allowed_Extensions = ['jpg', 'png'];   // 화이트리스트로 허용할 확장자
-    $allowed_mime_types = array('image/jpeg', 'image/png', 'image/gif', 'text/plain');
-    $file = $_FILES['profile_img'];
+    $upload_dir = realpath('/var/www/uploads/profile/');    // 프로필 사진파일 저장 디렉토리
+    if ($upload_dir === false) {
+        die("업로드 디렉토리가 존재하지 않습니다.");
+    }
+    $upload_dir = rtrim($upload_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+    $allowed_Extensions = ['jpg', 'png', 'jepg']; // 화이트리스트로 허용할 확장자
+    $file = $_FILES['profile_img'] ?? null;
 
     $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));   // 소문자로 파일명 변환 후 확장자 추출
-    $fileName = basename($file['name']);     // 파일 이름 추출
 
-    $upfile_name = $file["name"];
+    $fileName = basename($file['name']);     // 파일 이름 추출
     $upfile_tmp_name = $file["tmp_name"];
     $upfile_type = $file["type"];
     $upfile_error = $file["error"];
 
-    if($upfile_name && !$upfile_error) {
-        if(!in_array($fileExtension, $allowed_Extensions) || !in_array($upfile_type, $allowed_mime_types)) {     // 확장자 필터링
-            echo "
-                <script>
-                    alert('허용되지 않는 확장자입니다. 파일 업로드를 차단합니다.');
-                    history.go(-1);
-                </script>
-            ";
-            exit;
+    if($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            die("업로드 오류 코드: ".$file['error']);
         }
-        else if($upfile_size > 10000000) {  // 파일 용량 필터링
-            echo "
-                <script>
-                    alert('업로드 파일 크기가 지정된 용량(10MB)을 초과합니다!<br>파일 크기를 체크해주세요!');
-                    history.go(-1);
-                </script>
-            ";
-            exit;
+
+        // 확장자 화이트리스트 기반 검증
+        if(!in_array($fileExtension, $allowed_Extensions, true)) {
+            die("허용되지 않는 확장자입니다.");
         }
-        else {
-            $new_name = $userid."_".time().".".$fileExtension;
-            // 확장자가 블랙리스트에 없고, 파일 사이즈가 10MB이하면 업로드 진행
-            $uploaded_file = $upload_dir.$new_name;
-            if(move_uploaded_file($upfile_tmp_name, $uploaded_file)) {
-                
-            }
-            else {
-                echo"
-                    <script>
-                        alert('파일을 지정한 디렉토리에 복사하는데 실패했습니다.');
-                    </script>
-                ";
-                exit;
+
+        // 용량 제한
+        if($file["size"] > 10000000) {
+            die("업로드 파일 크기가 10MB를 초과합니다.");
+        }
+
+        // 실제 MIME 검증(finfo) (DB에 저장하기 위함)
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $real_mime = finfo_file($finfo, $file["tmp_name"]);
+        finfo_close($finfo);
+
+        // getimagesize로 이미지가 진짜 맞는지 추가 확인
+        if (in_array($fileExtension, ['jpg','jpeg','png','webp'], true)) {
+            if (@getimagesize($file["tmp_name"]) === false) {
+                die("이미지 파일이 아닙니다.");
             }
         }
-        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = ? WHERE id=?");
+
+        // 저장 파일명 생성
+        $new_name = bin2hex(random_bytes(16)) . "." . $fileExtension;
+
+        $uploaded_file = $upload_dir . $new_name;
+
+        if(!move_uploaded_file($file["tmp_name"], $uploaded_file)) {
+            die("파일 저장 실패");
+        }
+
+        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = ? WHERE id = ?");
         $stmt->bind_param('sssss', $hash_pw, $name, $email, $new_name, $userid);
         $stmt->execute();
     }
@@ -95,7 +99,7 @@
         $stmt->execute();
     }
 
-    $stmt = $con->prepare("UPDATE board SET name = ? WHERE id=?");
+    $stmt = $con->prepare("UPDATE board SET name = ? WHERE id = ?");
     $stmt->bind_param('ss', $name, $userid);
     $stmt->execute();
 

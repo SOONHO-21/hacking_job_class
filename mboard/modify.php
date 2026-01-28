@@ -34,115 +34,65 @@
 
     $regist_day = date("Y-m-d (H:i)");
 
-    // $upload_dir = './data/';    // 첨부파일 저장 디렉토리
-    // $blocked_Extensions = ['php', 'jsp', 'asp', 'html']; // 블랙리스트로 차단할 확장자
-    // $file = $_FILES['upfile'];
-
-    // $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));   // 소문자로 파일명 변환 후 확장자 추출
-    // $fileName = basename($file['name']);     // 파일 이름 추출
-
-    // $upfile_name = $_FILES["upfile"]["name"];
-    // $upfile_tmp_name = $_FILES["upfile"]["tmp_name"];
-    // $upfile_type = $_FILES["upfile"]["type"];
-    // $upfile_size = $_FILES["upfile"]["size"];
-    // $upfile_error = $_FILES["upfile"]["error"];
-
-    // if($upfile_name && !$upfile_error) {
-    //     if(in_array($fileExtension, $blocked_Extensions) || $upfile_type == "application/octet-stream") {     // 확장자 필터링
-    //         echo "
-    //             <script>
-    //                 alert('허용되지 않는 확장자입니다. 파일 업로드를 차단합니다.');
-    //                 history.go(-1);
-    //             </script>
-    //         ";
-    //         exit;
-    //     }
-    //     else if($upfile_size > 10000000) {  // 파일 용량 필터링
-    //         echo "
-    //             <script>
-    //                 alert('업로드 파일 크기가 지정된 용량(10MB)을 초과합니다!<br>파일 크기를 체크해주세요!');
-    //                 history.go(-1);
-    //             </script>
-    //         ";
-    //         exit;
-    //     }
-    //     else {
-    //         // 확장자가 블랙리스트에 없고, 파일 사이즈가 10MB이하면 업로드 진행
-    //         $uploaded_file = $upload_dir.$fileName;
-    //         if(move_uploaded_file($file["tmp_name"], $uploaded_file)) {
-                
-    //         }
-    //         else {
-    //             echo"
-    //                 <script>
-    //                     alert('파일을 지정한 디렉토리에 복사하는데 실패했습니다.');
-    //                 </script>
-    //             ";
-    //             exit;
-    //         }
-    //     }
-    // }
-    // else {
-    //     $upfile_name      = "";
-	// 	$upfile_type      = "";
-	// 	$copied_file_name = "";
-    // }
-    $upload_dir = './data/';    // 첨부파일 저장 디렉토리
-    $allowed_Extensions = ['txt', 'jpg', 'jepg', 'webp', 'png', 'hwp', 'pdf', 'docx', 'doc', 'docm']; // 화이트리스트로 허용할 확장자
-    $allowed_mime_types = array('image/jpeg', 'image/png', 'image/gif', 'text/plain');
-    $file = $_FILES['upfile'];
-
-    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));   // 소문자로 파일명 변환 후 확장자 추출
-    $fileName = basename($file['name']);    // 파일 이름 추출
-    
-    $upfile_tmp_name = $file["tmp_name"];
-    $upfile_type = $file["type"];
-    $upfile_size = $file["size"];
-    $upfile_error = $file["error"];
-
-    if($fileName && !$upfile_error) {
-        // $copied_file_name = date("Y_m_d_H_i_s");
-        $copied_file_name = bin2hex(random_bytes(8));
-        $copied_file_name .= ".".$fileExtension;
-
-        if(!in_array($fileExtension, $allowed_Extensions) || !in_array($upfile_type, $allowed_mime_types)) {     // 확장자 필터링
-            echo "
-                <script>
-                    alert('허용되지 않는 확장자입니다. 파일 업로드를 차단합니다.');
-                    history.go(-1);
-                </script>
-            ";
-            exit;
-        }
-        else if($upfile_size > 10000000) {  // 파일 용량 필터링
-            echo "
-                <script>
-                    alert('업로드 파일 크기가 지정된 용량(10MB)을 초과합니다!<br>파일 크기를 체크해주세요!');
-                    history.go(-1);
-                </script>
-            ";
-            exit;
-        }
-        else {
-            // 확장자가 블랙리스트에 없고, 파일 사이즈가 10MB이하면 업로드 진행
-            $uploaded_file = $upload_dir.$copied_file_name;
-            if(move_uploaded_file($file["tmp_name"], $uploaded_file)) {
-                
-            }
-            else {
-                echo"
-                    <script>
-                        alert('파일을 지정한 디렉토리에 복사하는데 실패했습니다.');
-                    </script>
-                ";
-                exit;
-            }
-        }
+    // 업로드 디렉토리 준비
+    $upload_dir = realpath('/var/www/uploads/data/');
+    if ($upload_dir === false) {
+        die("업로드 디렉토리가 존재하지 않습니다.");
     }
-    else {
-        $fileName = "";
-		$upfile_type = "";
-		$copied_file_name = "";
+    // rtrim() : 문자열의 오른쪽(끝)에서 공백이나 특정 문자를 제거하는 데 사용
+    // 경로 끝에 붙어있는 "슬래시(/)" 또는 "역슬래시(\)" 를 지우고 다시 운영체제에 맞는 구분자를 1개 붙이는 것
+    $upload_dir = rtrim($upload_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+    // 허용 확장자 / MIME
+    $allowed_Extensions = ['txt', 'jpg', 'jpeg', 'webp', 'png', 'hwp', 'pdf', 'docx', 'doc', 'docm'];
+
+    $file = $_FILES['upfile'] ?? null;
+
+    $fileName = "";
+    $upfile_type = "";
+    $copied_file_name = "";
+
+    if($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            die("업로드 오류 코드: ".$file['error']);
+        }
+
+        $fileName = basename($file['name']);
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        // 확장자 화이트리스트 기반 검증
+        if(!in_array($fileExtension, $allowed_Extensions, true)) {
+            die("허용되지 않는 확장자입니다.");
+        }
+
+        // 용량 제한
+        if($file["size"] > 10000000) {
+            die("업로드 파일 크기가 10MB를 초과합니다.");
+        }
+
+        // 실제 MIME 검증(finfo) (DB에 저장하기 위함)
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $real_mime = finfo_file($finfo, $file["tmp_name"]);
+        finfo_close($finfo);
+
+        $upfile_type = $real_mime;
+
+        // 이미지면 getimagesize로 이미지가 진짜 맞는지 추가 확인
+        if (in_array($fileExtension, ['jpg','jpeg','png','webp'], true)) {
+            if (@getimagesize($file["tmp_name"]) === false) {
+                die("이미지 파일이 아닙니다.");
+            }
+        }
+
+        // 저장 파일명 생성
+        $copied_file_name = bin2hex(random_bytes(16)) . "." . $fileExtension;
+
+        $uploaded_file = $upload_dir . $copied_file_name;
+
+        if(!move_uploaded_file($file["tmp_name"], $uploaded_file)) {
+            die("파일 저장 실패");
+        }
     }
 
     $stmt = $con->prepare("UPDATE board SET subject = ?, content = ?, is_html = ?, regist_day = ?, file_name = ?, file_type = ?, file_copied = ? WHERE num = ?");

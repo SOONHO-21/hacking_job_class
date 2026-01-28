@@ -18,7 +18,7 @@
                 location.href = 'list.php?page=$page';
             </script>";
     } else {
-        $stmt = $con->prepare("DELETE FROM board WHERE num=?");
+        $stmt = $con->prepare("DELETE FROM board WHERE num = ?");
         $stmt->bind_param('i', $num);
         $stmt->execute();
 

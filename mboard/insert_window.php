@@ -22,10 +22,8 @@
     }
 
     $regist_day = date("Y-m-d (H:i)");
-
-    $upload_dir = '/var/www/uploads/data/';    // 첨부파일 저장 디렉토리
-    $upload_dir = realpath($upload_dir);
-
+    
+    $upload_dir = './data/';    // 첨부파일 저장 디렉토리
     $allowed_Extensions = ['txt', 'jpg', 'jepg', 'webp', 'png', 'hwp', 'pdf', 'docx', 'doc', 'docm']; // 화이트리스트로 허용할 확장자
     $allowed_mime_types = array('image/jpeg', 'image/png', 'image/gif', 'text/plain');
     $file = $_FILES['upfile'];
@@ -39,6 +37,7 @@
     $upfile_error = $file["error"];
 
     if($fileName && !$upfile_error) {
+        // $copied_file_name = date("Y_m_d_H_i_s");
         $copied_file_name = bin2hex(random_bytes(8));
         $copied_file_name .= ".".$fileExtension;
 
@@ -63,7 +62,10 @@
         else {
             // 확장자가 블랙리스트에 없고, 파일 사이즈가 10MB이하면 업로드 진행
             $uploaded_file = $upload_dir.$copied_file_name;
-            if(!move_uploaded_file($upfile_tmp_name, $uploaded_file)) {
+            if(move_uploaded_file($file["tmp_name"], $uploaded_file)) {
+                
+            }
+            else {
                 echo"
                     <script>
                         alert('파일을 지정한 디렉토리에 복사하는데 실패했습니다.');

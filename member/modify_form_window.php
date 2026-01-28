@@ -120,7 +120,11 @@
                 <!--csrf 토큰값 적용-->
                 <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                 <br><br>
-                <img src="profile_image.php?public_id=<?=$public_id?>" width="220" height="150"><br>
+                <?php if ($profile_img) { ?>
+                    <img src="./profile_upload/<?=$profile_img?>" width="220" height="150"><br>
+                <?php } else { ?>
+                    <img src="../img/default_profile.png" width="220" height="150"><br>
+                <?php } ?>
                 <label>프로필 사진 변경:</label>
                 <input type="file" name="profile_img">
             </ul>
