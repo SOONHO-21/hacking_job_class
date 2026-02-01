@@ -2,6 +2,16 @@
     include "../include/session.php";
     include "../include/db_connect.php";
 
+    if(!$userid) {
+        echo "
+            <script>
+                alert('Forbidded');
+                history.go(-1);
+            </script>
+        ";
+        exit;
+    }
+
     $current_pass = $_POST["current_pass"];  // 입력받은 현재 비밀번호
     $pass = $_POST["pass"];
     $hash_pw = "";
@@ -13,7 +23,7 @@
 
     $csrf_token = $_POST["csrf_token"];
 
-    $stmt = $con->prepare("SELECT pass FROM _mem WHERE id=?");
+    $stmt = $con->prepare("SELECT * FROM _mem WHERE id = ?");
     $stmt->bind_param('s', $userid);
     $stmt->execute();
 
@@ -43,7 +53,7 @@
     }
     $upload_dir = rtrim($upload_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
-    $allowed_Extensions = ['jpg', 'png', 'jepg']; // 화이트리스트로 허용할 확장자
+    $allowed_Extensions = ['jpeg', 'jpg', 'jpeg', 'png', 'webp']; // 화이트리스트로 허용할 확장자
     $file = $_FILES['profile_img'] ?? null;
 
     $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));   // 소문자로 파일명 변환 후 확장자 추출
@@ -74,27 +84,41 @@
         finfo_close($finfo);
 
         // getimagesize로 이미지가 진짜 맞는지 추가 확인
-        if (in_array($fileExtension, ['jpg','jpeg','png','webp'], true)) {
+        if (in_array($fileExtension, ['jpeg', 'jpg', 'jpeg', 'png', 'webp'], true)) {
             if (@getimagesize($file["tmp_name"]) === false) {
                 die("이미지 파일이 아닙니다.");
             }
         }
 
+        $current_img = $row['profile_img'] ?? "";
+        // 파일명 안전 처리
+        $file_copied_safe = basename($current_img);
+        
+        if(!empty($file_copied_safe)) {
+            $file_path = $upload_dir . $file_copied_safe;
+
+            // 2. 물리적 파일 삭제
+            if (!empty($file_path) && file_exists($file_path)) {
+                if (!unlink($file_path)) {
+                    echo "<pre>unlink 실패! last error: ";
+                }
+            }
+        }
+
         // 저장 파일명 생성
-        $new_name = bin2hex(random_bytes(16)) . "." . $fileExtension;
+        $new_name = bin2hex(random_bytes(16));
 
         $uploaded_file = $upload_dir . $new_name;
-
         if(!move_uploaded_file($file["tmp_name"], $uploaded_file)) {
             die("파일 저장 실패");
         }
-
+        
         $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = ? WHERE id = ?");
         $stmt->bind_param('sssss', $hash_pw, $name, $email, $new_name, $userid);
         $stmt->execute();
     }
     else {
-        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ?, profile_img = null WHERE id=?");
+        $stmt = $con->prepare("UPDATE _mem SET pass = ?, name = ?, email = ? WHERE id = ?");
         $stmt->bind_param('ssss', $hash_pw, $name, $email, $userid);
         $stmt->execute();
     }

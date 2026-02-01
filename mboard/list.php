@@ -157,7 +157,5 @@
 		<li><button class="btn btn-primary" onclick="location.href='list.php?page=<?=$page?>'">목록</button></li>
 		<li><button class="btn btn-secondary" onclick="location.href='form.php'">글쓰기</button></li>
 	</ul>
-
-    <a href="../serve_jwt_login_page/login_form.php">JWT Login Test Page</a>
 </body>
 </html>

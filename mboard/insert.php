@@ -63,7 +63,7 @@
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $real_mime = finfo_file($finfo, $file["tmp_name"]);
         finfo_close($finfo);
-
+        
         $upfile_type = $real_mime;
 
         // 이미지면 getimagesize로 이미지가 진짜 맞는지 추가 확인

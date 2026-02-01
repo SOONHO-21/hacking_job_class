@@ -5,26 +5,26 @@
     include "../include/db_connect.php";
 
     if(isset($id) && isset($pass)) {
-        $sql = "SELECT * from _mem WHERE id='$id' AND pass='$pass'";
-        $result = mysqli_query($con, $sql);     // 쿼리결과
+        $stmt = $con->prepare("SELECT * from _mem WHERE id = ?");
+        $stmt->bind_param('s', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        $num_match = mysqli_num_rows($result);  // 쿼리결과는 0개 아니면 1개
-        $row = mysqli_fetch_assoc($result);     // 쿼리 결과 컬럼 추출
+        $row = $result->fetch_assoc();
 
-        $user = $result->fetch_assoc();
-
-        mysqli_close($con);
-
-        if($num_match == 1) {     // 데이터를 비교
+        if($row && password_verify($pass, $row['pass'])) {
             // 세션값 설정
             session_start();
+            session_regenerate_id(true);
+            
             $_SESSION["userid"] = $row["id"];
             $_SESSION["username"] = $row["name"];
+            $_SESSION["public_id"] = $row["public_id"];
             $_SESSION["userlevel"] = $row["level"];
 
             echo "<script>
-                    location.href = '../mboard/list.php';
-                </script>";
+                     location.href = '../mboard/list.php';
+                 </script>";
         }
         else {
             echo "<script>
@@ -34,4 +34,5 @@
             exit;
         }
     }
+    mysqli_close($con);
 ?>

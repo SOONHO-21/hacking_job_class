@@ -25,7 +25,7 @@
     $email = $row["email"];
     $profile_img = $row['profile_img'];
     $regist_day = date("Y-m-d (H:i)");
-
+    
     unset($_SESSION['csrf_token']);     // 다음 요청 때 CSRF Token 갱신을 위해 폐기
 
     function generateCSRFToken() {

@@ -2,20 +2,21 @@
     include "../include/session.php";
     include "../include/db_connect.php";
 
-    $num = $_GET["num"];
+    $num = isset($_GET['num']) ? (int)$_GET['num'] : 0;
+
     $page = $_GET["page"];
 
-    $stmt = $con->prepare("SELECT * FROM board WHERE num = ?");
-    $stmt->bind_param('i', $num);
+    $stmt = $con->prepare("SELECT * FROM board WHERE num = ? AND id = ?");
+    $stmt->bind_param('is', $num, $userid);
     $stmt->execute();
 
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
 
-    if(!$userid) {
+    if(!$row) {
         echo "
             <script>
-                alert('게시판 수정은 로그인 후 이용해 주세요!');
+                alert('남이 쓴 글은 수정할 수 없습니다.');
                 history.go(-1);
             </script>
         ";
@@ -48,9 +49,11 @@
 
     $file = $_FILES['upfile'] ?? null;
 
-    $fileName = "";
-    $upfile_type = "";
-    $copied_file_name = "";
+    if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
+        $fileName = $row['file_name'];
+        $upfile_type = $row['file_type'];
+        $copied_file_name = $row['file_copied'];
+    }
 
     if($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
 
@@ -85,9 +88,23 @@
             }
         }
 
+        $file_copied = $row['file_copied'] ?? "";
+        // 파일명 안전 처리
+        $file_copied_safe = basename($file_copied);
+
+        if(!empty($file_copied_safe)) {
+            $file_path = $upload_dir . $file_copied_safe;
+
+            // 2. 물리적 파일 삭제
+            if (!empty($file_path) && file_exists($file_path)) {
+                if (!unlink($file_path)) {
+                    echo "<pre>unlink 실패! last error: ";
+                }
+            }
+        }
+
         // 저장 파일명 생성
         $copied_file_name = bin2hex(random_bytes(16)) . "." . $fileExtension;
-
         $uploaded_file = $upload_dir . $copied_file_name;
 
         if(!move_uploaded_file($file["tmp_name"], $uploaded_file)) {

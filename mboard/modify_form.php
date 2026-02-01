@@ -5,12 +5,22 @@
     $num = $_GET["num"];
     $page = $_GET["page"];
 
-    $stmt = $con->prepare("SELECT * FROM board WHERE num = ?");
-    $stmt->bind_param('i', $num);
+    $stmt = $con->prepare("SELECT * FROM board WHERE num = ? AND id = ?");
+    $stmt->bind_param('is', $num, $userid);
     $stmt->execute();
 
     $result = $stmt->get_result();
     $row = mysqli_fetch_assoc($result);
+
+    if(!$row) {
+        echo "
+            <script>
+                alert('남이 쓴 글은 수정할 수 없습니다.');
+                history.go(-1);
+            </script>
+        ";
+        exit;
+    }
 
     $subject = $row["subject"];
     $content = $row["content"];
