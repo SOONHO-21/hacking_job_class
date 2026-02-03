@@ -15,7 +15,7 @@
         if($row && password_verify($pass, $row['pass'])) {
             // 세션값 설정
             session_start();
-            session_regenerate_id(true);
+            session_regenerate_id(true);    // 기존 세션 ID 삭제 및 갱신
             
             $_SESSION["userid"] = $row["id"];
             $_SESSION["username"] = $row["name"];

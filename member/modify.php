@@ -21,7 +21,7 @@
     $email = $_POST["email"];
     $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
 
-    $csrf_token = $_POST["csrf_token"];
+    $csrf_token = $_POST["csrf_token"];     // POST 메시지로 CSRF 토큰도 수신
 
     $stmt = $con->prepare("SELECT * FROM _mem WHERE id = ?");
     $stmt->bind_param('s', $userid);
@@ -37,7 +37,7 @@
 
     // CSRF 토큰 검증
     function validateCSRFToken($token) {
-        return isset($_SESSION['csrf_token']) && ($_SESSION['csrf_token'] == $token);
+        return isset($_SESSION['csrf_token']) && ($_SESSION['csrf_token'] == $token);   // CSRF 토큰이 세션에 등록되어 있는지, POST로 받은 CSRF 토큰이 세션에 등록되어있는 CSRF 토큰과 같은지 확인
     }
 
     if(!validateCSRFToken($csrf_token)) {

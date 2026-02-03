@@ -31,7 +31,7 @@
     function generateCSRFToken() {
         if(!isset($_SESSION['csrf_token'])) {   // 요청마다 CSRF 토큰 갱신
             $token = bin2hex(random_bytes(32));
-            $_SESSION['csrf_token'] = $token;
+            $_SESSION['csrf_token'] = $token;   // CSRF 토큰을 세션에 등록
         }
         return $token;
     }

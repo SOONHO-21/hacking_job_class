@@ -16,9 +16,7 @@
     $is_html = $_POST['is_html'] ?? 'n';
 
     $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
-    if($is_html !== 'y'){
-        $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
-    }
+    $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
 
     $regist_day = date("Y-m-d (H:i)");
 
@@ -85,8 +83,8 @@
 
     include "../include/db_connect.php";
 
-    $stmt = $con->prepare("INSERT INTO board (id, name, public_id, subject, content, is_html, regist_day, file_name, file_type, file_copied) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('ssssssssss', $userid, $username, $public_id, $subject, $content, $is_html, $regist_day, $fileName, $upfile_type, $copied_file_name);
+    $stmt = $con->prepare("INSERT INTO board (id, name, public_id, subject, content, regist_day, file_name, file_type, file_copied) values(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('sssssssss', $userid, $username, $public_id, $subject, $content, $regist_day, $fileName, $upfile_type, $copied_file_name);
     $stmt->execute();
 
     mysqli_close($con);

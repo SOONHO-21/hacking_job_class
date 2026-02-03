@@ -1,5 +1,6 @@
 <?php
 include "../include/db_connect.php";
+include "admin_check.php";
 
 $result = mysqli_query($con, "SELECT id FROM _mem WHERE public_id = ''");
 

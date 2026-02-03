@@ -55,6 +55,9 @@
     $search_word = isset($_GET['search_word']) ? $_GET['search_word'] : '';
     
     if($search_word) {
+        // echo "$search_word 의 검색결과";    // XSS 취약점
+        echo htmlspecialchars($search_word)."의 검색결과";   // 패치
+
         if($search_field == "subject"){
             $stmt = $con->prepare("SELECT * FROM board WHERE subject LIKE ? ORDER BY num DESC");
             $search_term = "%" . $search_word . "%";

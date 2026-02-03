@@ -21,7 +21,7 @@
         $stmt->bind_param('s', $id);
         $stmt->execute();
         $result = $stmt->get_result();
-
+        
         $new_record = mysqli_num_rows($result);
 
         if($new_record) {    // 조회되는 쿼리 결과가 있으면 이미 있는 아이디라는 뜻

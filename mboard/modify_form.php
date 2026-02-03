@@ -67,9 +67,7 @@ function check_input(){
         <ul class="list-group">
             <li class="list-group-item">
                 <span class="badge bg-secondary">이름 : </span>
-                <span><?=$username?>
-                    <span class="is_html"><input type="checkbox" name="is_html" value="y" <?=$html_checked?>>HTML 쓰기</span>
-                </span>
+                <span><?=$username?></span>
             </li>
             <li class="list-group-item">
                 <span class="badge bg-secondary">제목 : </span>
